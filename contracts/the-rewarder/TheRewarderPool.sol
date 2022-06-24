@@ -5,7 +5,7 @@ pragma solidity ^0.8.0;
 import "./RewardToken.sol";
 import "../DamnValuableToken.sol";
 import "./AccountingToken.sol";
-
+import "hardhat/console.sol";
 /**
  * @title TheRewarderPool
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
@@ -67,7 +67,7 @@ contract TheRewarderPool {
 
         if(isNewRewardsRound()) {
             _recordSnapshot();
-        }        
+        }
         
         uint256 totalDeposits = accToken.totalSupplyAt(lastSnapshotIdForRewards);
         uint256 amountDeposited = accToken.balanceOfAt(msg.sender, lastSnapshotIdForRewards);
@@ -88,6 +88,8 @@ contract TheRewarderPool {
         lastSnapshotIdForRewards = accToken.snapshot();
         lastRecordedSnapshotTimestamp = block.timestamp;
         roundNumber++;
+        console.log(lastRecordedSnapshotTimestamp);
+        console.log(roundNumber);
     }
 
     function _hasRetrievedReward(address account) private view returns (bool) {
