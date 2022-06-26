@@ -5,7 +5,6 @@ pragma solidity ^0.8.0;
 import "./RewardToken.sol";
 import "../DamnValuableToken.sol";
 import "./AccountingToken.sol";
-import "hardhat/console.sol";
 /**
  * @title TheRewarderPool
  * @author Damn Vulnerable DeFi (https://damnvulnerabledefi.xyz)
@@ -27,7 +26,7 @@ contract TheRewarderPool {
     // Token used for internal accounting and snapshots
     // Pegged 1:1 with the liquidity token
     AccountingToken public accToken;
-    
+
     // Token in which rewards are issued
     RewardToken public immutable rewardToken;
 
@@ -39,7 +38,6 @@ contract TheRewarderPool {
         liquidityToken = DamnValuableToken(tokenAddress);
         accToken = new AccountingToken();
         rewardToken = new RewardToken();
-
         _recordSnapshot();
     }
 
@@ -48,7 +46,7 @@ contract TheRewarderPool {
      */
     function deposit(uint256 amountToDeposit) external {
         require(amountToDeposit > 0, "Must deposit tokens");
-        
+
         accToken.mint(msg.sender, amountToDeposit);
         distributeRewards();
 
@@ -68,7 +66,6 @@ contract TheRewarderPool {
         if(isNewRewardsRound()) {
             _recordSnapshot();
         }
-        
         uint256 totalDeposits = accToken.totalSupplyAt(lastSnapshotIdForRewards);
         uint256 amountDeposited = accToken.balanceOfAt(msg.sender, lastSnapshotIdForRewards);
 
@@ -81,15 +78,13 @@ contract TheRewarderPool {
             }
         }
 
-        return rewards;     
+        return rewards;
     }
 
     function _recordSnapshot() private {
         lastSnapshotIdForRewards = accToken.snapshot();
         lastRecordedSnapshotTimestamp = block.timestamp;
         roundNumber++;
-        console.log(lastRecordedSnapshotTimestamp);
-        console.log(roundNumber);
     }
 
     function _hasRetrievedReward(address account) private view returns (bool) {
