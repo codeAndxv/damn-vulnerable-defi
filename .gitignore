@@ -7,3 +7,5 @@ cache
 .vscode
 artifacts
 cache
+.idea
+package-lock.json
