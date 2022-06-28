@@ -93,7 +93,9 @@ contract FreeRiderAttack is Ownable, IUniswapV2Callee, IERC721Receiver{
         // (bal * 997 + 3 * _reserve0 - amount0Out * 3) - uint(_reserve0).mul(1000) >= 0
         // bal * 997  >= uint(_reserve0).mul(1000) + amount0Out * 3 - 3 * _reserve0
         // (bal * 997 + 3 * _reserve0 - amount0Out * 3) - uint(_reserve0).mul(1000) >= 0
-
+        // console.log((uint(_reserve0).mul(1000) + amount0Out * 3 - 3 * _reserve0) / 997);  9000045135406218655967
+        // console.log((uint(_reserve0).mul(1000) + amount0Out * 3 - 3 * _reserve0));  8973045000000000000000000
+        // console.log((uint(_reserve0).mul(1000) + amount0Out * 3 - 3 * _reserve0) / 997 * 997);  8973044999999999999999099
         return (uint(_reserve0).mul(1000) + amount0Out * 3 - 3 * _reserve0) / 997 - currentBalance0 + 1;
         // btw, for simply, can /996, can pass _uniswapV2Pair check
     }
