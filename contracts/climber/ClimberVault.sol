@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./ClimberTimelock.sol";
-
+import "hardhat/console.sol";
 /**
  * @title ClimberVault
  * @dev To be deployed behind a proxy following the UUPS pattern. Upgrades are to be triggered by the owner.
@@ -33,6 +33,7 @@ contract ClimberVault is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         // Initialize inheritance chain
         __Ownable_init();
         __UUPSUpgradeable_init();
+        console.log("initialize");
 
         // Deploy timelock and transfer ownership to it
         transferOwnership(address(new ClimberTimelock(admin, proposer)));
