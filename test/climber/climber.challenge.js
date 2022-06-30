@@ -54,7 +54,6 @@ describe('[Challenge] Climber', function () {
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
         const ClimberAttackFactory = await ethers.getContractFactory('ClimberAttack', attacker);
-        console.log(attacker.address);
         this.climberAttack = await ClimberAttackFactory.connect(attacker).deploy(this.timelock.address, this.vault.address, this.token.address);
         await this.climberAttack.start();
     });

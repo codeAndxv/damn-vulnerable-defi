@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "hardhat/console.sol";
-import "./AccessControl.sol";
 
 /**
  * @title ClimberTimelock
@@ -15,7 +14,6 @@ contract ClimberTimelock is AccessControl {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
-    bytes32 private idTem;
 
     // Possible states for an operation in this timelock contract
     enum OperationState {
@@ -83,14 +81,9 @@ contract ClimberTimelock is AccessControl {
         require(targets.length > 0 && targets.length < 256);
         require(targets.length == values.length);
         require(targets.length == dataElements.length);
-        console.log("schedule");
         bytes32 id = getOperationId(targets, values, dataElements, salt);
-
-        console.log(checkEqual(idTem, id));
         require(getOperationState(id) == OperationState.Unknown, "Operation already known");
-
         operations[id].readyAtTimestamp = uint64(block.timestamp) + delay;
-        console.log(bytes32ToString(id));
         operations[id].known = true;
     }
 
@@ -106,27 +99,10 @@ contract ClimberTimelock is AccessControl {
         require(targets.length == dataElements.length);
 
         bytes32 id = getOperationId(targets, values, dataElements, salt);
-        idTem = id;
 
         for (uint8 i = 0; i < targets.length; i++) {
-            console.log("index is %s", Strings.toString(i));
-            console.log("target[i] is %s", targets[i]);
-            console.log("address[i] is %s", address(this));
-            if(hasRole(PROPOSER_ROLE, address(this))) {
-                console.log("have role");
-            }else {
-                console.log("have not role");
-            }
             targets[i].functionCallWithValue(dataElements[i], values[i]);
-            if(hasRole(PROPOSER_ROLE, address(this))) {
-                console.log("have role");
-            }else {
-                console.log("have not role");
-            }
         }
-        console.log("getOperationStateInt(id) is %s", getOperationStateInt(id));
-        console.log(bytes32ToString(id));
-        console.log(operations[id].readyAtTimestamp);
         require(getOperationState(id) == OperationState.ReadyForExecution);
         operations[id].executed = true;
     }
@@ -154,37 +130,4 @@ contract ClimberTimelock is AccessControl {
 
     receive() external payable {}
 
-    function test() public onlyRole(ADMIN_ROLE){
-        console.log(msg.sender);
-        console.log("happy");
-    }
-
-    function grant1Role(bytes32 cc, address amount) public onlyRole(ADMIN_ROLE){
-        console.log(msg.sender);
-        console.log("happy1");
-    }
-
-
-    function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
-        uint8 i = 0;
-        while(i < 32 && _bytes32[i] != 0) {
-            i++;
-        }
-        bytes memory bytesArray = new bytes(i);
-        for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-            bytesArray[i] = _bytes32[i];
-        }
-        return string(bytesArray);
-    }
-
-    function checkEqual(bytes32 _first, bytes32 _second) private view returns (bool){
-        uint8 i = 0;
-        while(i<32 && _first[i] != 0 && _second[i] != 0) {
-            if(_first[i] != _second[i]) {
-                return false;
-            }
-            i++;
-        }
-        return true;
-    }
 }
