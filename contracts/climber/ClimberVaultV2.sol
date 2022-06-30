@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract ClimberVaultV2  is Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    address private _trueOwner;
     constructor() initializer {
 
     }
@@ -17,9 +18,9 @@ contract ClimberVaultV2  is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         __UUPSUpgradeable_init();
     }
 
-    function sweepFunds(address tokenAddress) external onlyOwner{
+    function sweepFunds(address tokenAddress, address recipient) external {
         IERC20 token = IERC20(tokenAddress);
-        require(token.transfer(owner(), token.balanceOf(address(this))), "Transfer failed");
+        require(token.transfer(recipient, token.balanceOf(address(this))), "Transfer failed");
     }
 
     // By marking this internal function with `onlyOwner`, we only allow the owner account to authorize an upgrade

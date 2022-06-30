@@ -15,6 +15,7 @@ contract ClimberTimelock is AccessControl {
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant PROPOSER_ROLE = keccak256("PROPOSER_ROLE");
+    bytes32 private idTem;
 
     // Possible states for an operation in this timelock contract
     enum OperationState {
@@ -52,7 +53,7 @@ contract ClimberTimelock is AccessControl {
 
     function getOperationState(bytes32 id) public view returns (OperationState) {
         Operation memory op = operations[id];
-        
+
         if(op.executed) {
             return OperationState.Executed;
         } else if(op.readyAtTimestamp >= block.timestamp) {
@@ -83,11 +84,11 @@ contract ClimberTimelock is AccessControl {
         require(targets.length == values.length);
         require(targets.length == dataElements.length);
         console.log("schedule");
-
         bytes32 id = getOperationId(targets, values, dataElements, salt);
 
+        console.log(checkEqual(idTem, id));
         require(getOperationState(id) == OperationState.Unknown, "Operation already known");
-        
+
         operations[id].readyAtTimestamp = uint64(block.timestamp) + delay;
         console.log(bytes32ToString(id));
         operations[id].known = true;
@@ -105,6 +106,7 @@ contract ClimberTimelock is AccessControl {
         require(targets.length == dataElements.length);
 
         bytes32 id = getOperationId(targets, values, dataElements, salt);
+        idTem = id;
 
         for (uint8 i = 0; i < targets.length; i++) {
             console.log("index is %s", Strings.toString(i));
@@ -173,5 +175,16 @@ contract ClimberTimelock is AccessControl {
             bytesArray[i] = _bytes32[i];
         }
         return string(bytesArray);
+    }
+
+    function checkEqual(bytes32 _first, bytes32 _second) private view returns (bool){
+        uint8 i = 0;
+        while(i<32 && _first[i] != 0 && _second[i] != 0) {
+            if(_first[i] != _second[i]) {
+                return false;
+            }
+            i++;
+        }
+        return true;
     }
 }
