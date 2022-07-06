@@ -107,21 +107,6 @@ contract ClimberTimelock is AccessControl {
         operations[id].executed = true;
     }
 
-
-    function getOperationStateInt(bytes32 id) public view returns (uint) {
-        Operation memory op = operations[id];
-
-        if(op.executed) {
-            return 0;
-        } else if(op.readyAtTimestamp >= block.timestamp) {
-            return 1;
-        } else if(op.readyAtTimestamp > 0) {
-            return 2;
-        } else {
-            return 3;
-        }
-    }
-
     function updateDelay(uint64 newDelay) external {
         require(msg.sender == address(this), "Caller must be timelock itself");
         require(newDelay <= 14 days, "Delay must be 14 days or less");
